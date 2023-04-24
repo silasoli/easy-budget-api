@@ -8,13 +8,13 @@ export type UserDocument = User & Document;
 export class User {
   _id?: mongoose.ObjectId | string;
 
-  @Prop()
+  @Prop({ required: true, lowercase: true })
   name: string;
 
-  @Prop({ unique: true })
+  @Prop({ required: true, unique: true, lowercase: true })
   email: string;
 
-  @Prop({ select: false })
+  @Prop({ required: true, select: false })
   password: string;
 
   @Prop({ default: true })
