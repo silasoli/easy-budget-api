@@ -1,7 +1,6 @@
 {
   "version": 2,
   "env": {
-    "MONGO_URI": "@shop_api_mongo_uri"
   },
   "builds": [
     {
