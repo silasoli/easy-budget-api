@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user.entity';
+import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -16,8 +17,14 @@ export class UsersService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  private async findByEmail(email: string): Promise<User> {
-    return this.userModel.findOne({ email: email.toLowerCase() });
+  private async transformBody(dto: any) {
+    if (dto.password) dto.password = await bcrypt.hash(dto.password, 12);
+  }
+
+  public async findByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ email: email.toLowerCase() }, [
+      '+password',
+    ]);
   }
 
   private async validCreate(dto: CreateUserDto): Promise<void> {
@@ -26,9 +33,13 @@ export class UsersService {
   }
 
   public async create(dto: CreateUserDto): Promise<User> {
-    await this.validCreate(dto);
+    const rawData = { ...dto };
 
-    return this.userModel.create(dto);
+    await this.transformBody(rawData);
+
+    await this.validCreate(rawData);
+
+    return this.userModel.create(rawData);
   }
 
   public async findAll(): Promise<User[]> {
@@ -60,12 +71,20 @@ export class UsersService {
 
     await this.validUpdate(_id, dto);
 
-    return this.userModel.updateOne({ _id }, dto);
+    const rawData = { ...dto };
+
+    await this.transformBody(rawData);
+
+    return this.userModel.updateOne({ _id }, rawData);
   }
 
   public async remove(_id: string): Promise<any> {
     await this.findUserByID(_id);
 
     return this.userModel.deleteOne({ _id });
+  }
+
+  public async comparePass(password, hash) {
+    return await bcrypt.compare(password, hash);
   }
 }
