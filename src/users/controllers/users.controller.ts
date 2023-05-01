@@ -16,10 +16,10 @@ import { User } from '../schemas/user.entity';
 import { ValidationUtil } from '../../common/validations.util';
 import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(AuthUserJwtGuard)
+// @UseGuards(AuthUserJwtGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

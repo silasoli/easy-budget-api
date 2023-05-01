@@ -9,7 +9,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ description: 'User login endpoint.' })
-  @Post('/auth')
+  @Post('/users')
   async login(@Body() loginDto: UserLoginDto) {
     const user = await this.authService.validateUser(loginDto);
     if (!user) throw new ForbiddenException('Invalid credentials');
