@@ -3,6 +3,7 @@ import { UserLoginDto } from '../dto/user-login.dto';
 import { UsersService } from '../../users/services/users.service';
 import { User } from '../../users/schemas/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { Ilogin } from '../interfaces/Ilogin.interface';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +12,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(login: UserLoginDto): Promise<User> {
+  async validateUser(login: UserLoginDto): Promise<Ilogin> {
     const user = await this.usersService.findByEmail(login.email);
 
     if (!user) return null;
@@ -23,11 +24,12 @@ export class AuthService {
 
     if (!passMatch) return null;
 
-    return user;
+    return { _id: user._id, name: user.name, email: user.email };
   }
 
-  async login(user: any) {
+  async login(user: Ilogin) {
     const { _id, name, email } = user;
+
     const payload = { name, sub: _id };
     return {
       id: _id,

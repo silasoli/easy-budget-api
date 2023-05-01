@@ -17,6 +17,7 @@ async function bootstrap() {
     .setTitle('Orça Fácil API')
     .setDescription('Orça Fácil API developed by ConstruCode')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
