@@ -23,7 +23,8 @@ export class ProductsService {
 
   public validAccountType(accountType: string) {
     const types = Object.keys(MaterialCategoriesEnum);
-    if (!types.includes(accountType)) throw Error('Categoria inválida');
+    if (!types.includes(accountType))
+      throw new BadRequestException('Categoria inválida');
   }
 
   private async validCreate(dto: CreateProductDto): Promise<void> {
