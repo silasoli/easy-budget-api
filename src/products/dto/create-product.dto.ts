@@ -13,7 +13,7 @@ export class CreateProductDto {
 
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'É necessário informar o Preço do Produto.' })
-  price: string;
+  price: number;
 
   @ApiProperty({ required: true, enum: MaterialCategoriesEnum })
   @IsNotEmpty({ message: 'É necessário informar a categoria.' })
