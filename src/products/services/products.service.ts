@@ -58,7 +58,9 @@ export class ProductsService {
   }
 
   private async validUpdate(_id: string, dto: UpdateProductDto): Promise<void> {
-    this.validAccountType(dto.category);
+    if (dto.category) {
+      this.validAccountType(dto.category);
+    }
 
     if (dto.name) {
       const product = await this.findByName(dto.name);
