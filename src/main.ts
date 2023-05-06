@@ -13,10 +13,7 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
 
-  app.enableCors({
-    credentials: true,
-    origin: '*',
-  });
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Orça Fácil API')
