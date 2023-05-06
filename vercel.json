@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "builds": [
+   "builds": [
     {
       "src": "src/main.ts",
       "use": "@vercel/node"
@@ -10,7 +10,10 @@
     {
       "src": "/(.*)",
       "dest": "src/main.ts",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      "headers": {
+        "Access-Control-Allow-Origin": ""
+      }
     }
   ]
 }
