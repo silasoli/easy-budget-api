@@ -18,7 +18,7 @@ export class ProductsService {
   ) {}
 
   public async findByName(name: string): Promise<Product> {
-    return this.productModel.findOne({ email: name.toLowerCase() });
+    return this.productModel.findOne({ name: name.toLowerCase() });
   }
 
   public validAccountType(accountType: string) {
@@ -29,8 +29,8 @@ export class ProductsService {
   private async validCreate(dto: CreateProductDto): Promise<void> {
     this.validAccountType(dto.category);
 
-    const user = await this.findByName(dto.name);
-    if (user) throw new BadRequestException('Name already used');
+    const product = await this.findByName(dto.name);
+    if (product) throw new BadRequestException('Name already used');
   }
 
   public async create(dto: CreateProductDto): Promise<Product> {
@@ -61,8 +61,8 @@ export class ProductsService {
     this.validAccountType(dto.category);
 
     if (dto.name) {
-      const user = await this.findByName(dto.name);
-      if (user && String(user._id) != _id)
+      const product = await this.findByName(dto.name);
+      if (product && String(product._id) != _id)
         throw new BadRequestException('Name already used');
     }
   }
