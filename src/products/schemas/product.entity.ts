@@ -2,19 +2,22 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
 
-export type UserDocument = User & Document;
+export type ProductDocument = Product & Document;
 @Schema()
-export class User {
+export class Product {
   _id?: mongoose.ObjectId | string;
 
-  @Prop({ required: true, lowercase: true })
+  @Prop({ required: true, unique: true, lowercase: true })
   name: string;
 
   @Prop({ required: true, unique: true, lowercase: true })
-  email: string;
+  brand: string;
 
-  @Prop({ required: true, select: false })
-  password: string;
+  @Prop({ required: true })
+  price: number;
+
+  @Prop({ required: true })
+  category: string;
 
   @Prop({ default: () => new Date() })
   createdAt: Date;
@@ -23,4 +26,4 @@ export class User {
   active?: boolean;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const ProductSchema = SchemaFactory.createForClass(Product);

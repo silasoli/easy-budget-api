@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user.entity';
 import * as bcrypt from 'bcrypt';
-import { Model } from 'mongoose';
+import { Model, QueryWithHelpers } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -66,7 +66,10 @@ export class UsersService {
     }
   }
 
-  public async update(_id: string, dto: UpdateUserDto): Promise<any> {
+  public async update(
+    _id: string,
+    dto: UpdateUserDto,
+  ): Promise<QueryWithHelpers<unknown, unknown>> {
     await this.findUserByID(_id);
 
     await this.validUpdate(_id, dto);
@@ -78,13 +81,15 @@ export class UsersService {
     return this.userModel.updateOne({ _id }, rawData);
   }
 
-  public async remove(_id: string): Promise<any> {
+  public async remove(
+    _id: string,
+  ): Promise<QueryWithHelpers<unknown, unknown>> {
     await this.findUserByID(_id);
 
     return this.userModel.deleteOne({ _id });
   }
 
-  public async comparePass(password, hash) {
+  public async comparePass(password: string, hash: string) {
     return await bcrypt.compare(password, hash);
   }
 }
