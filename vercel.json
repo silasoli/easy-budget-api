@@ -12,7 +12,7 @@
       "dest": "src/main.ts",
       "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
       "headers": {
-        "Access-Control-Allow-Origin": ""
+        "Access-Control-Allow-Origin": "*"
       }
     }
   ]
