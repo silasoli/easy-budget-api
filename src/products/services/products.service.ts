@@ -6,9 +6,16 @@ import {
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductDocument } from '../schemas/product.entity';
+import {
+  CategoryType,
+  Product,
+  ProductDocument,
+} from '../schemas/product.entity';
 import { Model, QueryWithHelpers } from 'mongoose';
-import { MaterialCategoriesEnum } from '../enum/material-categories.enum';
+import {
+  MaterialCategoriesEnum,
+  MaterialCategoriesLabels,
+} from '../enum/material-categories.enum';
 
 @Injectable()
 export class ProductsService {
@@ -21,10 +28,14 @@ export class ProductsService {
     return this.productModel.findOne({ name: name.toLowerCase() });
   }
 
-  public validAccountType(accountType: string) {
+  public validAccountType(materialType: string): void {
     const types = Object.keys(MaterialCategoriesEnum);
-    if (!types.includes(accountType))
+    if (!types.includes(materialType))
       throw new BadRequestException('Categoria inválida');
+  }
+
+  private getCategoryLabel(materialType: string): CategoryType {
+    return MaterialCategoriesLabels[materialType];
   }
 
   private async validCreate(dto: CreateProductDto): Promise<void> {
@@ -35,11 +46,11 @@ export class ProductsService {
   }
 
   public async create(dto: CreateProductDto): Promise<Product> {
-    const rawData = { ...dto };
+    await this.validCreate(dto);
 
-    await this.validCreate(rawData);
+    const materialLabel = this.getCategoryLabel(dto.category);
 
-    return this.productModel.create(rawData);
+    return this.productModel.create({ ...dto, category: materialLabel });
   }
 
   public async findAll(): Promise<Product[]> {
@@ -78,9 +89,11 @@ export class ProductsService {
 
     await this.validUpdate(_id, dto);
 
-    const rawData = { ...dto };
+    const materialLabel = this.getCategoryLabel(dto.category);
 
-    return this.productModel.updateOne({ _id }, rawData);
+    const product = { ...dto, category: materialLabel };
+
+    return this.productModel.updateOne({ _id }, product);
   }
 
   // public async remove(_id: string): Promise<any> {
