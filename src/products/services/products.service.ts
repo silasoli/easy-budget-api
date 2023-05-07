@@ -31,7 +31,7 @@ export class ProductsService {
     this.validAccountType(dto.category);
 
     const product = await this.findByName(dto.name);
-    if (product) throw new BadRequestException('Name already used');
+    if (product) throw new BadRequestException('Nome já utilizado.');
   }
 
   public async create(dto: CreateProductDto): Promise<Product> {
@@ -66,7 +66,7 @@ export class ProductsService {
     if (dto.name) {
       const product = await this.findByName(dto.name);
       if (product && String(product._id) != _id)
-        throw new BadRequestException('Name already used');
+        throw new BadRequestException('Nome já utilizado.');
     }
   }
 

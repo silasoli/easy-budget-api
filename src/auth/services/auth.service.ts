@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserLoginDto } from '../dto/user-login.dto';
 import { UsersService } from '../../users/services/users.service';
-import { User } from '../../users/schemas/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Ilogin } from '../interfaces/Ilogin.interface';
 
@@ -39,7 +38,7 @@ export class AuthService {
     };
   }
 
-  async decodeAccessToken(accessToken: string) {
+  async decodeAccessToken(accessToken: string): Promise<any> {
     const response = await this.jwtService.verifyAsync(accessToken);
 
     return response;
