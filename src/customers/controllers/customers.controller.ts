@@ -6,16 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CustomersService } from '../services/customers.service';
 import { CreateCustomerDto } from '../dto/create-customer.dto';
 import { UpdateCustomerDto } from '../dto/update-customer.dto';
 import { Customer } from '../schemas/customer.entity';
 import { QueryWithHelpers } from 'mongoose';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 
+@ApiBearerAuth()
 @ApiTags('Customers')
 @Controller('customers')
+@UseGuards(AuthUserJwtGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ProductsService } from '../services/products.service';
 import { UpdateProductDto } from '../dto/update-product.dto';
@@ -6,10 +6,12 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryWithHelpers } from 'mongoose';
 import { ValidationUtil } from '../../common/validations.util';
 import { Product } from '../schemas/product.entity';
+import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 
 @ApiBearerAuth()
 @ApiTags('Products')
 @Controller('products')
+@UseGuards(AuthUserJwtGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
