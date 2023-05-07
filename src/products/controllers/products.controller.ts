@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ProductsService } from '../services/products.service';
 import { UpdateProductDto } from '../dto/update-product.dto';
@@ -7,6 +16,7 @@ import { QueryWithHelpers } from 'mongoose';
 import { ValidationUtil } from '../../common/validations.util';
 import { Product } from '../schemas/product.entity';
 import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
+import { CategoryFilterDto } from '../dto/category-filter.dto';
 
 @ApiBearerAuth()
 @ApiTags('Products')
@@ -23,6 +33,13 @@ export class ProductsController {
   @Get()
   public async findAll(): Promise<Product[]> {
     return this.productsService.findAll();
+  }
+
+  @Get('category')
+  public async findAllByCategory(
+    @Query() query: CategoryFilterDto,
+  ): Promise<Product[]> {
+    return this.productsService.findAllByCategory(query);
   }
 
   @Get(':id')

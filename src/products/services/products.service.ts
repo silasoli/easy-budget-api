@@ -16,6 +16,7 @@ import {
   MaterialCategoriesEnum,
   MaterialCategoriesLabels,
 } from '../enum/material-categories.enum';
+import { CategoryFilterDto } from '../dto/category-filter.dto';
 
 @Injectable()
 export class ProductsService {
@@ -55,6 +56,16 @@ export class ProductsService {
 
   public async findAll(): Promise<Product[]> {
     return this.productModel.find();
+  }
+
+  public async findAllByCategory(
+    filter: CategoryFilterDto,
+  ): Promise<Product[]> {
+    this.validAccountType(filter.category);
+
+    const category = this.getCategoryLabel(filter.category);
+
+    return this.productModel.find({ category });
   }
 
   private async findProductByID(_id: string): Promise<Product> {
