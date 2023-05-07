@@ -43,22 +43,24 @@ export class ProductsController {
   }
 
   @Get(':id')
-  public async findOne(@Param('id') id: string): Promise<Product> {
-    ValidationUtil.validObjectId(id);
-    return this.productsService.findOne(id);
+  public async findOne(@Param('id') _id: string): Promise<Product> {
+    ValidationUtil.validObjectId(_id);
+    return this.productsService.findOne(_id);
   }
 
   @Patch(':id')
   public async update(
-    @Param('id') id: string,
+    @Param('id') _id: string,
     @Body() dto: UpdateProductDto,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
-    ValidationUtil.validObjectId(id);
-    return this.productsService.update(id, dto);
+    ValidationUtil.validObjectId(_id);
+    return this.productsService.update(_id, dto);
   }
 
   // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.productsService.remove(+id);
+  // public async remove(
+  //   @Param('id') _id: string,
+  // ): Promise<QueryWithHelpers<unknown, unknown>> {
+  //   return this.productsService.remove(_id);
   // }
 }
