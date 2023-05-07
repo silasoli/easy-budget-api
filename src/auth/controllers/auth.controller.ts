@@ -13,7 +13,7 @@ export class AuthController {
   @Post('/users')
   async login(@Body() loginDto: UserLoginDto): Promise<Ilogin> {
     const user = await this.authService.validateUser(loginDto);
-    if (!user) throw new ForbiddenException('Invalid credentials');
+    if (!user) throw new ForbiddenException('Credenciais inválidas');
 
     return this.authService.login({ ...user });
   }

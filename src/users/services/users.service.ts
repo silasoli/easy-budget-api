@@ -29,7 +29,7 @@ export class UsersService {
 
   private async validCreate(dto: CreateUserDto): Promise<void> {
     const user = await this.findByEmail(dto.email);
-    if (user) throw new BadRequestException('Email already used');
+    if (user) throw new BadRequestException('Email já utilizado.');
   }
 
   public async create(dto: CreateUserDto): Promise<User> {
@@ -62,7 +62,7 @@ export class UsersService {
     if (dto.email) {
       const user = await this.findByEmail(dto.email);
       if (user && String(user._id) != _id)
-        throw new BadRequestException('Email já utilizado');
+        throw new BadRequestException('Email já utilizado.');
     }
   }
 
