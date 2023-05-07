@@ -1,8 +1,10 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+
 
 export type CustomerDocument = Customer & Document;
 
+@Schema()
 export class Customer {
   _id?: mongoose.ObjectId | string;
 
