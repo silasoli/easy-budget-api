@@ -12,11 +12,9 @@ import {
   ProductDocument,
 } from '../schemas/product.entity';
 import { Model, QueryWithHelpers } from 'mongoose';
-import {
-  MaterialCategoriesEnum,
-  MaterialCategoriesLabels,
-} from '../enum/material-categories.enum';
+import { MaterialCategoriesLabels } from '../enum/material-categories.enum';
 import { CategoryFilterDto } from '../dto/category-filter.dto';
+import { ValidationUtil } from '../../common/validations.util';
 
 @Injectable()
 export class ProductsService {
@@ -29,18 +27,12 @@ export class ProductsService {
     return this.productModel.findOne({ name: name.toLowerCase() });
   }
 
-  public validAccountType(materialType: string): void {
-    const types = Object.keys(MaterialCategoriesEnum);
-    if (!types.includes(materialType))
-      throw new BadRequestException('Categoria inválida');
-  }
-
   private getCategoryLabel(materialType: string): CategoryType {
     return MaterialCategoriesLabels[materialType];
   }
 
   private async validCreate(dto: CreateProductDto): Promise<void> {
-    this.validAccountType(dto.category);
+    ValidationUtil.validCategoryType(dto.category);
 
     const product = await this.findByName(dto.name);
     if (product) throw new BadRequestException('Nome já utilizado.');
@@ -61,7 +53,7 @@ export class ProductsService {
   public async findAllByCategory(
     filter: CategoryFilterDto,
   ): Promise<Product[]> {
-    this.validAccountType(filter.category);
+    ValidationUtil.validCategoryType(filter.category);
 
     const category = this.getCategoryLabel(filter.category);
 
@@ -82,7 +74,7 @@ export class ProductsService {
 
   private async validUpdate(_id: string, dto: UpdateProductDto): Promise<void> {
     if (dto.category) {
-      this.validAccountType(dto.category);
+      ValidationUtil.validCategoryType(dto.category);
     }
 
     if (dto.name) {
