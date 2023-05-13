@@ -10,13 +10,14 @@ import {
   ProductsBudgetDocument,
 } from '../schemas/products-budget.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Aggregate, Model, QueryWithHelpers } from 'mongoose';
+import { Model, QueryWithHelpers } from 'mongoose';
 import { CreateProductsBudgetDto } from '../dto/create-products-budget.dto';
 import { BudgetService } from '../../budget/services/budget.service';
 import { ProductsService } from '../../products/services/products.service';
 import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
 import { Budget } from '../../budget/schemas/budget.entity';
-import * as pdf from 'html-pdf';
+// import * as pdf from 'html-pdf';
+import { create } from 'html-pdf';
 import { AggregateUtil } from '../../common/aggregate.util';
 import { GeneratePDFUtil } from '../../common/generate-pdf.util';
 import { ICalcAmount } from '../interfaces/ICalcAmount.interface';
@@ -118,7 +119,7 @@ export class ProductsBudgetsService {
     console.log('options')
 
     const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
-      pdf.create(html, options).toBuffer((err, buffer) => {
+      create(html, options).toBuffer((err, buffer) => {
         if (err) {
           reject(err);
         } else {
