@@ -46,6 +46,10 @@ export class ProductsService {
     return this.productModel.create({ ...dto, category: materialLabel });
   }
 
+  public async findAllNames(): Promise<Product[]> {
+    return this.productModel.find({}, { name: 1, price: 1 });
+  }
+
   public async findAll(): Promise<Product[]> {
     return this.productModel.find();
   }

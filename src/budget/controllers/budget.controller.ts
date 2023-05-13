@@ -15,6 +15,7 @@ import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Budget } from '../schemas/budget.entity';
 import { QueryWithHelpers } from 'mongoose';
+import { ValidationUtil } from '../../common/validations.util';
 
 @ApiBearerAuth()
 @ApiTags('Budgets')
@@ -34,22 +35,25 @@ export class BudgetController {
   }
 
   @Get(':id')
-  public async findOne(@Param('id') id: string): Promise<Budget> {
-    return this.budgetService.findOneWithPopulate(id);
+  public async findOne(@Param('id') _id: string): Promise<Budget> {
+    ValidationUtil.validObjectId(_id);
+    return this.budgetService.findOneWithPopulate(_id);
   }
 
   @Patch(':id')
   public async update(
-    @Param('id') id: string,
+    @Param('id') _id: string,
     @Body() updateBudgetDto: UpdateBudgetDto,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
-    return this.budgetService.update(id, updateBudgetDto);
+    ValidationUtil.validObjectId(_id);
+    return this.budgetService.update(_id, updateBudgetDto);
   }
 
   @Delete(':id')
   public async remove(
-    @Param('id') id: string,
+    @Param('id') _id: string,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
-    return this.budgetService.remove(id);
+    ValidationUtil.validObjectId(_id);
+    return this.budgetService.remove(_id);
   }
 }

@@ -15,6 +15,7 @@ import { ProductsBudget } from '../schemas/products-budget.entity';
 import { QueryWithHelpers } from 'mongoose';
 import { ApiTags } from '@nestjs/swagger';
 import { BudgetFilterDto } from '../dto/budget-filter.dto';
+import { ValidationUtil } from '../../common/validations.util';
 
 @ApiTags('Products Budgets')
 @Controller('products-budgets')
@@ -31,14 +32,14 @@ export class ProductsBudgetsController {
   }
 
   @Get('budgets/:id')
-  public async findAll(
-    @Query() query: BudgetFilterDto,
-  ): Promise<ProductsBudget[]> {
-    return this.productsBudgetsService.findAllProductsByBudget(query);
+  public async findAll(@Param('id') _id: string): Promise<ProductsBudget[]> {
+    ValidationUtil.validObjectId(_id);
+    return this.productsBudgetsService.findAllProductsByBudget(_id);
   }
 
   @Get(':id')
   public async findOne(@Param('id') _id: string): Promise<ProductsBudget> {
+    ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.findOne(_id);
   }
 
@@ -47,6 +48,7 @@ export class ProductsBudgetsController {
     @Param('id') _id: string,
     @Body() updateProductsBudgetDto: UpdateProductsBudgetDto,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
+    ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.update(_id, updateProductsBudgetDto);
   }
 
@@ -54,6 +56,7 @@ export class ProductsBudgetsController {
   public async remove(
     @Param('id') _id: string,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
+    ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.remove(_id);
   }
 }

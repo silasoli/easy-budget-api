@@ -1,13 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, Min } from 'class-validator';
+import { IsInt, IsMongoId, IsNotEmpty, Min } from 'class-validator';
 
 export class CreateProductsBudgetDto {
   @ApiProperty({ required: true, example: '{BUDGET_ID}' })
   @IsNotEmpty({ message: 'É necessário informar o ID do Orçamento.' })
+  @IsMongoId({ message: 'Invalid Format of ID' })
   budgetId: string;
 
   @ApiProperty({ required: true, example: '{PRODUCT_ID}' })
   @IsNotEmpty({ message: 'É necessário informar o ID do Produto.' })
+  @IsMongoId({ message: 'Invalid Format of ID' })
   productId: string;
 
   @ApiProperty({ required: true })
