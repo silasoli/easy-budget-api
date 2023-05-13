@@ -115,6 +115,8 @@ export class ProductsBudgetsService {
 
     const options = { format: 'A4' };
 
+    console.log('options')
+
     const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
       pdf.create(html, options).toBuffer((err, buffer) => {
         if (err) {
@@ -124,6 +126,8 @@ export class ProductsBudgetsService {
         }
       });
     });
+
+    console.log('final')
 
     return pdfBuffer;
   }
