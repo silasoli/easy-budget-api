@@ -34,6 +34,11 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('names')
+  public async findAllNames(): Promise<User[]> {
+    return this.usersService.findAllNames();
+  }
+
   @Get(':id')
   public async findOne(@Param('id') id: string): Promise<User> {
     ValidationUtil.validObjectId(id);

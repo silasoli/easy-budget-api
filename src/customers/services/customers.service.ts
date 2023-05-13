@@ -52,6 +52,10 @@ export class CustomersService {
     return this.customerModel.create(dto);
   }
 
+  public async findAllNames(): Promise<Customer[]> {
+    return this.customerModel.find({}, { name: 1, cpf: 1 });
+  }
+
   public async findAll(): Promise<Customer[]> {
     return this.customerModel.find();
   }

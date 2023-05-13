@@ -48,15 +48,17 @@ export class BudgetService {
   }
 
   public async findAll(): Promise<Budget[]> {
-    return this.budgetModel
-      .find()
-      .populate([{ path: 'customerId' }, { path: 'sellerId' }]);
+    return this.budgetModel.find().populate([
+      { path: 'customerId', select: ['name'] },
+      { path: 'sellerId', select: ['name'] },
+    ]);
   }
 
   private async findBudgetByID(_id: string): Promise<Budget> {
-    const customer = await this.budgetModel
-      .findById(_id)
-      .populate([{ path: 'customerId' }, { path: 'sellerId' }]);
+    const customer = await this.budgetModel.findById(_id).populate([
+      { path: 'customerId', select: ['name'] },
+      { path: 'sellerId', select: ['name'] },
+    ]);
 
     if (!customer) throw new NotFoundException('Budget not found');
 

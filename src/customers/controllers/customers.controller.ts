@@ -15,6 +15,7 @@ import { Customer } from '../schemas/customer.entity';
 import { QueryWithHelpers } from 'mongoose';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
+import { ValidationUtil } from '../../common/validations.util';
 
 @ApiBearerAuth()
 @ApiTags('Customers')
@@ -33,8 +34,14 @@ export class CustomersController {
     return this.customersService.findAll();
   }
 
+  @Get('names')
+  public async findAllNames(): Promise<Customer[]> {
+    return this.customersService.findAllNames();
+  }
+
   @Get(':id')
   public async findOne(@Param('id') _id: string): Promise<Customer> {
+    ValidationUtil.validObjectId(_id);
     return this.customersService.findOne(_id);
   }
 
@@ -43,6 +50,7 @@ export class CustomersController {
     @Param('id') _id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
+    ValidationUtil.validObjectId(_id);
     return this.customersService.update(_id, updateCustomerDto);
   }
 
@@ -50,6 +58,7 @@ export class CustomersController {
   public async remove(
     @Param('id') _id: string,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
+    ValidationUtil.validObjectId(_id);
     return this.customersService.remove(_id);
   }
 }

@@ -35,6 +35,11 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('names')
+  public async findAllNames(): Promise<Product[]> {
+    return this.productsService.findAllNames();
+  }
+
   @Get('category')
   public async findAllByCategory(
     @Query() query: CategoryFilterDto,
@@ -61,6 +66,7 @@ export class ProductsController {
   // public async remove(
   //   @Param('id') _id: string,
   // ): Promise<QueryWithHelpers<unknown, unknown>> {
+    // ValidationUtil.validObjectId(id);
   //   return this.productsService.remove(_id);
   // }
 }

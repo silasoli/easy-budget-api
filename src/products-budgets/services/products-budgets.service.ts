@@ -63,13 +63,10 @@ export class ProductsBudgetsService {
     return this.productsBudgetModel.create(dto);
   }
 
-  public async findAllProductsByBudget(
-    filter: BudgetFilterDto,
-  ): Promise<ProductsBudget[]> {
-    const { budgetId } = filter;
-    await this.budgetService.findOne(budgetId);
+  public async findAllProductsByBudget(_id: string): Promise<ProductsBudget[]> {
+    await this.budgetService.findOne(_id);
 
-    return this.productsBudgetModel.find({ budgetId });
+    return this.productsBudgetModel.find({ budgetId: _id });
   }
 
   private async findProductsBudgetByID(_id: string): Promise<ProductsBudget> {
