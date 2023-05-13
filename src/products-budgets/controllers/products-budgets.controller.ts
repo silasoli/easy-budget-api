@@ -31,16 +31,16 @@ export class ProductsBudgetsController {
     return this.productsBudgetsService.create(dto);
   }
 
-  @Get('budgets/:id')
-  public async findAll(@Param('id') _id: string): Promise<ProductsBudget[]> {
-    ValidationUtil.validObjectId(_id);
-    return this.productsBudgetsService.findAllProductsByBudget(_id);
-  }
-
   @Get(':id')
   public async findOne(@Param('id') _id: string): Promise<ProductsBudget> {
     ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.findOne(_id);
+  }
+
+  @Get('budgets/:id')
+  public async findAll(@Param('id') _id: string): Promise<ProductsBudget[]> {
+    ValidationUtil.validObjectId(_id);
+    return this.productsBudgetsService.findAllProductsByBudget(_id);
   }
 
   @Patch(':id')
