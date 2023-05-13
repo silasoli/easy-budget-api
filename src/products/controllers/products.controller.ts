@@ -66,7 +66,7 @@ export class ProductsController {
   // public async remove(
   //   @Param('id') _id: string,
   // ): Promise<QueryWithHelpers<unknown, unknown>> {
-    // ValidationUtil.validObjectId(id);
+  // ValidationUtil.validObjectId(id);
   //   return this.productsService.remove(_id);
   // }
 }

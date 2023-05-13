@@ -16,13 +16,17 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Budget } from '../schemas/budget.entity';
 import { QueryWithHelpers } from 'mongoose';
 import { ValidationUtil } from '../../common/validations.util';
+import { ProductsBudgetsService } from '../../products-budgets/services/products-budgets.service';
 
 @ApiBearerAuth()
 @ApiTags('Budgets')
 @Controller('budgets')
 @UseGuards(AuthUserJwtGuard)
 export class BudgetController {
-  constructor(private readonly budgetService: BudgetService) {}
+  constructor(
+    private readonly budgetService: BudgetService,
+    private readonly productsBudgetsService: ProductsBudgetsService,
+  ) {}
 
   @Post()
   public async create(@Body() dto: CreateBudgetDto): Promise<Budget> {
@@ -32,6 +36,12 @@ export class BudgetController {
   @Get()
   public async findAll(): Promise<Budget[]> {
     return this.budgetService.findAll();
+  }
+
+  @Get('amounts/:id')
+  public async findAllAmounts(@Param('id') _id: string): Promise<any> {
+    ValidationUtil.validObjectId(_id);
+    return this.productsBudgetsService.calcAmountsByBudget(_id);
   }
 
   @Get(':id')
