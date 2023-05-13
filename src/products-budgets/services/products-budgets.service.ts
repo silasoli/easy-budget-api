@@ -10,14 +10,14 @@ import {
   ProductsBudgetDocument,
 } from '../schemas/products-budget.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryWithHelpers } from 'mongoose';
+import { Aggregate, Model, QueryWithHelpers } from 'mongoose';
 import { CreateProductsBudgetDto } from '../dto/create-products-budget.dto';
 import { BudgetService } from '../../budget/services/budget.service';
 import { ProductsService } from '../../products/services/products.service';
 import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
 import { Budget } from '../../budget/schemas/budget.entity';
-import mongoose from 'mongoose';
 import * as pdf from 'html-pdf';
+import { AggregateUtil } from '../../common/aggregate.util';
 
 @Injectable()
 export class ProductsBudgetsService {
@@ -27,7 +27,7 @@ export class ProductsBudgetsService {
     @Inject(forwardRef(() => BudgetService))
     private budgetService: BudgetService,
     private productService: ProductsService,
-  ) { }
+  ) {}
 
   private async findProductInBudget(
     budgetId: string,
@@ -198,58 +198,10 @@ export class ProductsBudgetsService {
     return pdfBuffer;
   }
 
-  public async calcAmountsByBudget(_id: string): Promise<any> {
-    return this.productsBudgetModel.aggregate([
-      { $match: { budgetId: new mongoose.Types.ObjectId(_id) } },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'productId',
-          foreignField: '_id',
-          as: 'product',
-        },
-      },
-      {
-        $unwind: '$product',
-      },
-      {
-        $addFields: {
-          amount: { $multiply: ['$quantity', '$product.price'] },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalQuantity: { $sum: '$quantity' },
-          items: {
-            $push: {
-              product: '$product',
-              quantity: '$quantity',
-              amount: '$amount',
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          totalQuantity: 1,
-          totalAmount: { $sum: '$items.amount' },
-          count: { $size: '$items' },
-          items: {
-            $map: {
-              input: '$items',
-              as: 'item',
-              in: {
-                productName: '$$item.product.name',
-                productBrand: '$$item.product.brand',
-                quantity: '$$item.quantity',
-                price: '$$item.product.price',
-                amount: '$$item.amount',
-              },
-            },
-          },
-        },
-      },
-    ]);
+  public async calcAmountsByBudget(
+    _id: string,
+  ): Promise<Aggregate<Array<unknown>>> {
+    const query = AggregateUtil.queryAmountsByBudget(_id);
+    return this.productsBudgetModel.aggregate(query);
   }
 }
