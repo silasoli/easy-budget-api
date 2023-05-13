@@ -48,11 +48,12 @@ export class BudgetController {
   }
 
   @Get(':id/pdf')
-  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Type', 'application/json')
   @Header('Content-Disposition', 'attachment; filename=budget.pdf')
   public async generatePDF(@Param('id') _id: string): Promise<StreamableFile> {
     ValidationUtil.validObjectId(_id);
     const item = await this.productsBudgetsService.generatePdf(_id);
+    console.log('controller')
     return new StreamableFile(item);
   }
 

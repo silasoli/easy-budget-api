@@ -113,8 +113,6 @@ export class ProductsBudgetsService {
     const footer = GeneratePDFUtil.generateFooter(data, items);
     const html = `${header}${footer}`;
 
-    console.log(html);
-
     const options = { format: 'A4' };
 
     const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
