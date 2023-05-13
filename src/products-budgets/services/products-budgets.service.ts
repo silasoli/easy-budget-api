@@ -10,13 +10,16 @@ import {
   ProductsBudgetDocument,
 } from '../schemas/products-budget.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, QueryWithHelpers } from 'mongoose';
+import { Aggregate, Model, QueryWithHelpers } from 'mongoose';
 import { CreateProductsBudgetDto } from '../dto/create-products-budget.dto';
 import { BudgetService } from '../../budget/services/budget.service';
 import { ProductsService } from '../../products/services/products.service';
 import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
 import { Budget } from '../../budget/schemas/budget.entity';
-import mongoose from 'mongoose';
+import * as pdf from 'html-pdf';
+import { AggregateUtil } from '../../common/aggregate.util';
+import { GeneratePDFUtil } from '../../common/generate-pdf.util';
+import { ICalcAmount } from '../interfaces/ICalcAmount.interface';
 
 @Injectable()
 export class ProductsBudgetsService {
@@ -102,58 +105,45 @@ export class ProductsBudgetsService {
     return this.productsBudgetModel.deleteMany({ budgetId });
   }
 
-  public async calcAmountsByBudget(_id: string): Promise<any> {
-    return this.productsBudgetModel.aggregate([
-      { $match: { budgetId: new mongoose.Types.ObjectId(_id) } },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'productId',
-          foreignField: '_id',
-          as: 'product',
-        },
-      },
-      {
-        $unwind: '$product',
-      },
-      {
-        $addFields: {
-          amount: { $multiply: ['$quantity', '$product.price'] },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalQuantity: { $sum: '$quantity' },
-          items: {
-            $push: {
-              product: '$product',
-              quantity: '$quantity',
-              amount: '$amount',
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          totalQuantity: 1,
-          totalAmount: { $sum: '$items.amount' },
-          count: { $size: '$items' },
-          items: {
-            $map: {
-              input: '$items',
-              as: 'item',
-              in: {
-                productName: '$$item.product.name',
-                productBrand: '$$item.product.brand',
-                quantity: '$$item.quantity',
-                price: '$$item.product.price',
-                amount: '$$item.amount',
-              },
-            },
-          },
-        },
-      },
-    ]);
+  public async generatePdf(_id: string): Promise<Buffer> {
+    const data = await this.calcAmountsByBudget(_id);
+    const budget = await this.budgetService.findOneWithPopulate(_id);
+    const header = GeneratePDFUtil.generateHead(budget);
+    const items = GeneratePDFUtil.generateTableOfItems(data.items);
+    const footer = GeneratePDFUtil.generateFooter(data, items);
+    const html = `${header}${footer}`;
+
+    console.log(html);
+
+    const options = { format: 'A4' };
+
+    const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
+      pdf.create(html, options).toBuffer((err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffer);
+        }
+      });
+    });
+
+    return pdfBuffer;
+  }
+
+  public async calcAmountsByBudget(_id: string): Promise<ICalcAmount> {
+    const query = AggregateUtil.queryAmountsByBudget(_id);
+    const result = await this.productsBudgetModel.aggregate(query);
+
+    const totalAmount: number = result[0]['totalAmount'];
+    const totalQuantity: number = result[0]['totalQuantity'];
+    const count: number = result[0]['count'];
+    const items = result[0]['items'];
+
+    return {
+      totalAmount,
+      totalQuantity,
+      count,
+      items,
+    };
   }
 }

@@ -28,6 +28,8 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'method',
     },
     customCssUrl:
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',

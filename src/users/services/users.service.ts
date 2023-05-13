@@ -17,7 +17,7 @@ export class UsersService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  private async transformBody(dto: any) {
+  private async transformBody(dto: CreateUserDto | UpdateUserDto) {
     if (dto.password) dto.password = await bcrypt.hash(dto.password, 12);
   }
 

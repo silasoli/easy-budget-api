@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Header,
+  StreamableFile,
 } from '@nestjs/common';
 import { BudgetService } from '../services/budget.service';
 import { CreateBudgetDto } from '../dto/create-budget.dto';
@@ -14,9 +16,10 @@ import { UpdateBudgetDto } from '../dto/update-budget.dto';
 import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Budget } from '../schemas/budget.entity';
-import { QueryWithHelpers } from 'mongoose';
+import { Aggregate, QueryWithHelpers } from 'mongoose';
 import { ValidationUtil } from '../../common/validations.util';
 import { ProductsBudgetsService } from '../../products-budgets/services/products-budgets.service';
+import { ICalcAmount } from '../../products-budgets/interfaces/ICalcAmount.interface';
 
 @ApiBearerAuth()
 @ApiTags('Budgets')
@@ -38,10 +41,19 @@ export class BudgetController {
     return this.budgetService.findAll();
   }
 
-  @Get('amounts/:id')
-  public async findAllAmounts(@Param('id') _id: string): Promise<any> {
+  @Get(':id/amounts')
+  public async findAllAmounts(@Param('id') _id: string): Promise<ICalcAmount> {
     ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.calcAmountsByBudget(_id);
+  }
+
+  @Get(':id/pdf')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'attachment; filename=budget.pdf')
+  public async generatePDF(@Param('id') _id: string): Promise<StreamableFile> {
+    ValidationUtil.validObjectId(_id);
+    const item = await this.productsBudgetsService.generatePdf(_id);
+    return new StreamableFile(item);
   }
 
   @Get(':id')
