@@ -1,7 +1,10 @@
+import { Budget } from '../budget/schemas/budget.entity';
 import { ICalcAmount } from '../products-budgets/interfaces/ICalcAmount.interface';
+import { FormatUtil } from './format.util';
 
 class GeneratePDFCls {
-  generateHead(): string {
+  generateHead(budget: Budget): string {
+    const createDate = FormatUtil.formatDate(budget.createdAt);
     const header = `
     <!DOCTYPE html>
     <html>
@@ -26,8 +29,15 @@ class GeneratePDFCls {
             }
         </style>
         </head>
-        <body>
-            <h1>Orçamento</h1>
+        <body style="border-style: solid; padding-bottom: 15px;">
+            <h1 style="text-align: center;">Orçamento</h1>
+        <div style="margin: 0; padding-left: 15px;">
+            <p>Nome: ${budget.name}</p>
+            <p>Vendedor: ${budget.sellerId.name}</p>
+            <p>Cliente: ${budget.customerId.name}</p>
+            <p>Categoria: ${budget.category.label}</p>
+            <p>Data de Criação: ${createDate}</p>
+        </div>
         <table>
         <thead>
             <tr>

@@ -107,10 +107,13 @@ export class ProductsBudgetsService {
 
   public async generatePdf(_id: string): Promise<Buffer> {
     const data = await this.calcAmountsByBudget(_id);
-    const header = GeneratePDFUtil.generateHead();
+    const budget = await this.budgetService.findOneWithPopulate(_id);
+    const header = GeneratePDFUtil.generateHead(budget);
     const items = GeneratePDFUtil.generateTableOfItems(data.items);
     const footer = GeneratePDFUtil.generateFooter(data, items);
     const html = `${header}${footer}`;
+
+    console.log(html);
 
     const options = { format: 'A4' };
 
