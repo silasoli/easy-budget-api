@@ -10,13 +10,14 @@ import {
   ProductsBudgetDocument,
 } from '../schemas/products-budget.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, QueryWithHelpers } from 'mongoose';
+import { Model, QueryWithHelpers } from 'mongoose';
 import { CreateProductsBudgetDto } from '../dto/create-products-budget.dto';
 import { BudgetService } from '../../budget/services/budget.service';
 import { ProductsService } from '../../products/services/products.service';
 import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
 import { Budget } from '../../budget/schemas/budget.entity';
 import mongoose from 'mongoose';
+import * as pdf from 'html-pdf';
 
 @Injectable()
 export class ProductsBudgetsService {
@@ -26,7 +27,7 @@ export class ProductsBudgetsService {
     @Inject(forwardRef(() => BudgetService))
     private budgetService: BudgetService,
     private productService: ProductsService,
-  ) {}
+  ) { }
 
   private async findProductInBudget(
     budgetId: string,
@@ -100,6 +101,101 @@ export class ProductsBudgetsService {
     budgetId: string,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
     return this.productsBudgetModel.deleteMany({ budgetId });
+  }
+
+  public async generatePdf(_id: string): Promise<Buffer> {
+    const header = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Orçamento</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .total {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Orçamento</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Marca</th>
+          <th>Quantidade</th>
+          <th>Preço</th>
+          <th>Total</th>
+        </tr>
+      </thead>`;
+
+    const items = [
+      {
+        productName: 'teste1',
+        productBrand: 'teste orcamento',
+        quantity: 1,
+        price: 10,
+        amount: 10,
+      },
+      {
+        productName: 'teste2',
+        productBrand: 'teste orcamento',
+        quantity: 2,
+        price: 12.5,
+        amount: 25,
+      },
+    ];
+
+    let itemsHtml = '';
+    for (let i = 0; i < items.length; i++) {
+      itemsHtml += `
+    <tr>
+      <td>${items[i].productName}</td>
+      <td>${items[i].productBrand}</td>
+      <td>${items[i].quantity}</td>
+      <td>${items[i].price}</td>
+      <td>${items[i].amount}</td>
+    </tr>
+  `;
+    }
+
+    const body = ` <tbody>
+      ${itemsHtml}
+              <tr>
+          <td class="total" colspan="3">Total</td>
+          <td class="total">R$ {{totalAmount}}</td>
+        </tr>
+    </tbody>
+     </table>
+  </body>
+</html>`;
+
+    const html = `${header}${body}`;
+
+    const options = { format: 'A4' };
+
+    const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
+      pdf.create(html, options).toBuffer((err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffer);
+        }
+      });
+    });
+
+    return pdfBuffer;
   }
 
   public async calcAmountsByBudget(_id: string): Promise<any> {

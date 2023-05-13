@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Header,
+  StreamableFile,
 } from '@nestjs/common';
 import { BudgetService } from '../services/budget.service';
 import { CreateBudgetDto } from '../dto/create-budget.dto';
@@ -38,10 +40,19 @@ export class BudgetController {
     return this.budgetService.findAll();
   }
 
-  @Get('amounts/:id')
+  @Get(':id/amounts')
   public async findAllAmounts(@Param('id') _id: string): Promise<any> {
     ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.calcAmountsByBudget(_id);
+  }
+
+  @Get(':id/pdf')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'attachment; filename=budget.pdf')
+  public async generatePDF(@Param('id') _id: string): Promise<StreamableFile> {
+    ValidationUtil.validObjectId(_id);
+    const item = await this.productsBudgetsService.generatePdf(_id);
+    return new StreamableFile(item);
   }
 
   @Get(':id')
