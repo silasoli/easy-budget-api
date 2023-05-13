@@ -11,5 +11,6 @@ import { MaterialCategoriesController } from './controllers/products-categories.
   ],
   controllers: [ProductsController, MaterialCategoriesController],
   providers: [ProductsService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

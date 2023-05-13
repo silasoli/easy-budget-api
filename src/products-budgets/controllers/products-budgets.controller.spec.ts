@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsBudgetsController } from './products-budgets.controller';
-import { ProductsBudgetsService } from './products-budgets.service';
+import { ProductsBudgetsService } from '../services/products-budgets.service';
 
 describe('ProductsBudgetsController', () => {
   let controller: ProductsBudgetsController;
@@ -11,7 +11,9 @@ describe('ProductsBudgetsController', () => {
       providers: [ProductsBudgetsService],
     }).compile();
 
-    controller = module.get<ProductsBudgetsController>(ProductsBudgetsController);
+    controller = module.get<ProductsBudgetsController>(
+      ProductsBudgetsController,
+    );
   });
 
   it('should be defined', () => {

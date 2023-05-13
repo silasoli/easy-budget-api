@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
+import { OmitType } from '@nestjs/swagger';
 import { CreateProductsBudgetDto } from './create-products-budget.dto';
 
-export class UpdateProductsBudgetDto extends PartialType(CreateProductsBudgetDto) {}
+export class UpdateProductsBudgetDto extends OmitType(CreateProductsBudgetDto, [
+  'budgetId',
+  'productId',
+] as const) {}

@@ -1,34 +1,59 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ProductsBudgetsService } from './products-budgets.service';
-import { CreateProductsBudgetDto } from './dto/create-products-budget.dto';
-import { UpdateProductsBudgetDto } from './dto/update-products-budget.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
+import { CreateProductsBudgetDto } from '../dto/create-products-budget.dto';
+import { ProductsBudgetsService } from '../services/products-budgets.service';
+import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
+import { ProductsBudget } from '../schemas/products-budget.entity';
+import { QueryWithHelpers } from 'mongoose';
+import { ApiTags } from '@nestjs/swagger';
+import { BudgetFilterDto } from '../dto/budget-filter.dto';
 
+@ApiTags('Products Budgets')
 @Controller('products-budgets')
 export class ProductsBudgetsController {
-  constructor(private readonly productsBudgetsService: ProductsBudgetsService) {}
+  constructor(
+    private readonly productsBudgetsService: ProductsBudgetsService,
+  ) {}
 
   @Post()
-  create(@Body() createProductsBudgetDto: CreateProductsBudgetDto) {
-    return this.productsBudgetsService.create(createProductsBudgetDto);
+  public async create(
+    @Body() dto: CreateProductsBudgetDto,
+  ): Promise<ProductsBudget> {
+    return this.productsBudgetsService.create(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.productsBudgetsService.findAll();
+  @Get('budgets/:id')
+  public async findAll(
+    @Query() query: BudgetFilterDto,
+  ): Promise<ProductsBudget[]> {
+    return this.productsBudgetsService.findAllProductsByBudget(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsBudgetsService.findOne(+id);
+  public async findOne(@Param('id') _id: string): Promise<ProductsBudget> {
+    return this.productsBudgetsService.findOne(_id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductsBudgetDto: UpdateProductsBudgetDto) {
-    return this.productsBudgetsService.update(+id, updateProductsBudgetDto);
+  public async update(
+    @Param('id') _id: string,
+    @Body() updateProductsBudgetDto: UpdateProductsBudgetDto,
+  ): Promise<QueryWithHelpers<unknown, unknown>> {
+    return this.productsBudgetsService.update(_id, updateProductsBudgetDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsBudgetsService.remove(+id);
+  public async remove(
+    @Param('id') _id: string,
+  ): Promise<QueryWithHelpers<unknown, unknown>> {
+    return this.productsBudgetsService.remove(_id);
   }
 }

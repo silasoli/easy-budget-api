@@ -26,14 +26,8 @@ export class ProductsBudget {
   @Prop({ required: true })
   quantity: number;
 
-  @Prop({ required: true })
-  amount: number;
-
   @Prop({ default: () => new Date() })
   createdAt: Date;
-
-  @Prop({ default: true })
-  active?: boolean;
 }
 
 export const ProductsBudgetSchema =

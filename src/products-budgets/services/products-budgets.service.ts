@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import {
   ProductsBudget,
@@ -9,83 +11,97 @@ import {
 } from '../schemas/products-budget.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryWithHelpers } from 'mongoose';
-import { ValidationUtil } from '../../common/validations.util';
+import { CreateProductsBudgetDto } from '../dto/create-products-budget.dto';
+import { BudgetService } from '../../budget/services/budget.service';
+import { ProductsService } from '../../products/services/products.service';
+import { BudgetFilterDto } from '../dto/budget-filter.dto';
+import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
+import { Budget } from '../../budget/schemas/budget.entity';
 
 @Injectable()
 export class ProductsBudgetsService {
-  ProductsBudgetModel: any;
   constructor(
     @InjectModel(ProductsBudget.name)
-    private ProductsProductsBudgetModel: Model<ProductsBudgetDocument>,
+    private productsBudgetModel: Model<ProductsBudgetDocument>,
+    @Inject(forwardRef(() => BudgetService))
+    private budgetService: BudgetService,
+    private productService: ProductsService,
   ) {}
 
-  private async findByName(name: string): Promise<ProductsBudget> {
-    return this.ProductsBudgetModel.findOne({ name: name.toLowerCase() });
+  private async findProductInBudget(
+    budgetId: string,
+    productId: string,
+  ): Promise<void> {
+    const item = await this.productsBudgetModel.findOne({
+      budgetId,
+      productId,
+    });
+    if (item) throw new BadRequestException('Item já adicionado!');
   }
 
-  private async validCreate(dto): Promise<void> {
-    ValidationUtil.validCategoryType(dto.category);
-
-    const name = await this.findByName(dto.name);
-    if (name) throw new BadRequestException('Nome já utilizado.');
+  private async validProductCategory(
+    budget: Budget,
+    dto: CreateProductsBudgetDto,
+  ): Promise<void> {
+    const product = await this.productService.findOne(dto.productId);
+    const verify = product.category.key === budget.category.key;
+    const message = 'Categoria do Produto diferente da categoria do orçamento';
+    if (!verify) throw new BadRequestException(message);
   }
 
-  public async create(dto): Promise<ProductsBudget> {
+  private async validCreate(dto: CreateProductsBudgetDto): Promise<void> {
+    const budget = await this.budgetService.findOne(dto.budgetId);
+
+    await this.validProductCategory(budget, dto);
+
+    await this.findProductInBudget(dto.budgetId, dto.productId);
+  }
+
+  public async create(dto: CreateProductsBudgetDto): Promise<ProductsBudget> {
     await this.validCreate(dto);
 
-    return this.ProductsBudgetModel.create(dto);
+    return this.productsBudgetModel.create(dto);
   }
 
-  public async findAll(): Promise<ProductsBudget[]> {
-    return this.ProductsBudgetModel.find().populate([
-      { path: 'customerId' },
-      { path: 'sellerId' },
-    ]);
+  public async findAllProductsByBudget(
+    filter: BudgetFilterDto,
+  ): Promise<ProductsBudget[]> {
+    const { budgetId } = filter;
+    await this.budgetService.findOne(budgetId);
+
+    return this.productsBudgetModel.find({ budgetId });
   }
 
-  private async findBudgetByID(_id: string): Promise<ProductsBudget> {
-    const customer = await this.ProductsBudgetModel.findById(_id).populate([
-      { path: 'customerId' },
-      { path: 'sellerId' },
-    ]);
+  private async findProductsBudgetByID(_id: string): Promise<ProductsBudget> {
+    const item = await this.productsBudgetModel.findById(_id);
 
-    if (!customer) throw new NotFoundException('Budget not found');
+    if (!item) throw new NotFoundException('Item not found');
 
-    return customer;
+    return item;
   }
 
   public async findOne(_id: string): Promise<ProductsBudget> {
-    return this.findBudgetByID(_id);
-  }
-
-  private async validUpdate(_id: string, dto): Promise<void> {
-    if (dto.category) {
-      ValidationUtil.validCategoryType(dto.category);
-    }
-
-    if (dto.name) {
-      const customer = await this.findByName(dto.name);
-      if (customer && String(customer._id) != _id)
-        throw new BadRequestException('Nome já utilizado.');
-    }
+    return this.findProductsBudgetByID(_id);
   }
 
   public async update(
     _id: string,
-    dto,
+    dto: UpdateProductsBudgetDto,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
-    await this.findBudgetByID(_id);
+    await this.findOne(_id);
 
-    await this.validUpdate(_id, dto);
-
-    const rawData = { ...dto };
-
-    return this.ProductsBudgetModel.updateOne({ _id }, rawData);
+    return this.productsBudgetModel.updateOne({ _id }, dto);
   }
 
   public async remove(
     _id: string,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
-    return this.ProductsBudgetModel.deleteOne({ _id });
+    return this.productsBudgetModel.deleteOne({ _id });
+  }
+
+  public async removeAllProductsBudgetByBudget(
+    budgetId: string,
+  ): Promise<QueryWithHelpers<unknown, unknown>> {
+    return this.productsBudgetModel.deleteMany({ budgetId });
   }
 }

@@ -35,7 +35,7 @@ export class BudgetController {
 
   @Get(':id')
   public async findOne(@Param('id') id: string): Promise<Budget> {
-    return this.budgetService.findOne(id);
+    return this.budgetService.findOneWithPopulate(id);
   }
 
   @Patch(':id')

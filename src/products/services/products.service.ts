@@ -73,10 +73,6 @@ export class ProductsService {
   }
 
   private async validUpdate(_id: string, dto: UpdateProductDto): Promise<void> {
-    if (dto.category) {
-      ValidationUtil.validCategoryType(dto.category);
-    }
-
     if (dto.name) {
       const product = await this.findByName(dto.name);
       if (product && String(product._id) != _id)
@@ -92,9 +88,7 @@ export class ProductsService {
 
     await this.validUpdate(_id, dto);
 
-    const materialLabel = this.getCategoryLabel(dto.category);
-
-    const product = { ...dto, category: materialLabel };
+    const product = { ...dto };
 
     return this.productModel.updateOne({ _id }, product);
   }
