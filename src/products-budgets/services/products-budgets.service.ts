@@ -18,6 +18,8 @@ import { UpdateProductsBudgetDto } from '../dto/update-products-budget.dto';
 import { Budget } from '../../budget/schemas/budget.entity';
 import * as pdf from 'html-pdf';
 import { AggregateUtil } from '../../common/aggregate.util';
+import { GeneratePDFUtil } from '../../common/generate-pdf.util';
+import { ICalcAmount } from '../interfaces/ICalcAmount.interface';
 
 @Injectable()
 export class ProductsBudgetsService {
@@ -104,84 +106,11 @@ export class ProductsBudgetsService {
   }
 
   public async generatePdf(_id: string): Promise<Buffer> {
-    const header = `<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Orçamento</title>
-    <style>
-      table {
-        border-collapse: collapse;
-        width: 100%;
-      }
-      th, td {
-        text-align: left;
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-      .total {
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Orçamento</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Marca</th>
-          <th>Quantidade</th>
-          <th>Preço</th>
-          <th>Total</th>
-        </tr>
-      </thead>`;
-
-    const items = [
-      {
-        productName: 'teste1',
-        productBrand: 'teste orcamento',
-        quantity: 1,
-        price: 10,
-        amount: 10,
-      },
-      {
-        productName: 'teste2',
-        productBrand: 'teste orcamento',
-        quantity: 2,
-        price: 12.5,
-        amount: 25,
-      },
-    ];
-
-    let itemsHtml = '';
-    for (let i = 0; i < items.length; i++) {
-      itemsHtml += `
-    <tr>
-      <td>${items[i].productName}</td>
-      <td>${items[i].productBrand}</td>
-      <td>${items[i].quantity}</td>
-      <td>${items[i].price}</td>
-      <td>${items[i].amount}</td>
-    </tr>
-  `;
-    }
-
-    const body = ` <tbody>
-      ${itemsHtml}
-              <tr>
-          <td class="total" colspan="3">Total</td>
-          <td class="total">R$ {{totalAmount}}</td>
-        </tr>
-    </tbody>
-     </table>
-  </body>
-</html>`;
-
-    const html = `${header}${body}`;
+    const data = await this.calcAmountsByBudget(_id);
+    const header = GeneratePDFUtil.generateHead();
+    const items = GeneratePDFUtil.generateTableOfItems(data.items);
+    const footer = GeneratePDFUtil.generateFooter(data, items);
+    const html = `${header}${footer}`;
 
     const options = { format: 'A4' };
 
@@ -198,10 +127,20 @@ export class ProductsBudgetsService {
     return pdfBuffer;
   }
 
-  public async calcAmountsByBudget(
-    _id: string,
-  ): Promise<Aggregate<Array<unknown>>> {
+  public async calcAmountsByBudget(_id: string): Promise<ICalcAmount> {
     const query = AggregateUtil.queryAmountsByBudget(_id);
-    return this.productsBudgetModel.aggregate(query);
+    const result = await this.productsBudgetModel.aggregate(query);
+
+    const totalAmount: number = result[0]['totalAmount'];
+    const totalQuantity: number = result[0]['totalQuantity'];
+    const count: number = result[0]['count'];
+    const items = result[0]['items'];
+
+    return {
+      totalAmount,
+      totalQuantity,
+      count,
+      items,
+    };
   }
 }

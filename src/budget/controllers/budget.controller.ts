@@ -19,6 +19,7 @@ import { Budget } from '../schemas/budget.entity';
 import { Aggregate, QueryWithHelpers } from 'mongoose';
 import { ValidationUtil } from '../../common/validations.util';
 import { ProductsBudgetsService } from '../../products-budgets/services/products-budgets.service';
+import { ICalcAmount } from '../../products-budgets/interfaces/ICalcAmount.interface';
 
 @ApiBearerAuth()
 @ApiTags('Budgets')
@@ -41,9 +42,7 @@ export class BudgetController {
   }
 
   @Get(':id/amounts')
-  public async findAllAmounts(
-    @Param('id') _id: string,
-  ): Promise<Aggregate<Array<unknown>>> {
+  public async findAllAmounts(@Param('id') _id: string): Promise<ICalcAmount> {
     ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.calcAmountsByBudget(_id);
   }
