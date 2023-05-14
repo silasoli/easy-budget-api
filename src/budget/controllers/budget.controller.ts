@@ -47,14 +47,10 @@ export class BudgetController {
     return this.productsBudgetsService.calcAmountsByBudget(_id);
   }
 
-  @Get(':id/pdf')
-  @Header('Content-Type', 'application/octet-stream')
-  @Header('Content-Disposition', 'attachment; filename=budget.pdf')
-  public async generatePDF(@Param('id') _id: string): Promise<StreamableFile> {
+  @Get(':id/html')
+  public async generatePDF(@Param('id') _id: string): Promise<string> {
     ValidationUtil.validObjectId(_id);
-    const item = await this.productsBudgetsService.generatePdf(_id);
-    console.log('controller')
-    return new StreamableFile(item);
+    return this.productsBudgetsService.generatePdf(_id);
   }
 
   @Get(':id')

@@ -106,31 +106,13 @@ export class ProductsBudgetsService {
     return this.productsBudgetModel.deleteMany({ budgetId });
   }
 
-  public async generatePdf(_id: string): Promise<Buffer> {
+  public async generatePdf(_id: string): Promise<string> {
     const data = await this.calcAmountsByBudget(_id);
     const budget = await this.budgetService.findOneWithPopulate(_id);
     const header = GeneratePDFUtil.generateHead(budget);
     const items = GeneratePDFUtil.generateTableOfItems(data.items);
     const footer = GeneratePDFUtil.generateFooter(data, items);
-    const html = `${header}${footer}`;
-
-    const options = { format: 'A4' };
-
-    console.log('options')
-
-    const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
-      create(html, options).toBuffer((err, buffer) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(buffer);
-        }
-      });
-    });
-
-    console.log('final')
-
-    return pdfBuffer;
+    return `${header}${footer}`;
   }
 
   public async calcAmountsByBudget(_id: string): Promise<ICalcAmount> {
