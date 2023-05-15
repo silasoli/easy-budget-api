@@ -46,8 +46,15 @@ export class ProductsService {
     return this.productModel.create({ ...dto, category: materialLabel });
   }
 
-  public async findAllNames(): Promise<Product[]> {
-    return this.productModel.find({}, { name: 1, price: 1 });
+  public async findAllNames(filter: CategoryFilterDto): Promise<Product[]> {
+    ValidationUtil.validCategoryType(filter.category);
+
+    const category = this.getCategoryLabel(filter.category);
+
+    return this.productModel.find(
+      { category },
+      { name: 1, price: 1, brand: 1 },
+    );
   }
 
   public async findAll(): Promise<Product[]> {

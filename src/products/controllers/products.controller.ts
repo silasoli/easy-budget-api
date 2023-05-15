@@ -36,8 +36,10 @@ export class ProductsController {
   }
 
   @Get('names')
-  public async findAllNames(): Promise<Product[]> {
-    return this.productsService.findAllNames();
+  public async findAllNames(
+    @Query() query: CategoryFilterDto,
+  ): Promise<Product[]> {
+    return this.productsService.findAllNames(query);
   }
 
   @Get('category')
