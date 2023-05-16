@@ -10,7 +10,7 @@ export type BudgetDocument = Budget & Document;
 export class Budget {
   _id?: mongoose.ObjectId | string;
 
-  @Prop({ required: true, lowercase: true })
+  @Prop({ required: true, unique: true, lowercase: true })
   name: string;
 
   @Prop({

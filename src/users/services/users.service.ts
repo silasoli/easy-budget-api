@@ -27,9 +27,16 @@ export class UsersService {
     ]);
   }
 
+  public async findByName(name: string): Promise<User> {
+    return this.userModel.findOne({ name: name.toLowerCase() });
+  }
+
   private async validCreate(dto: CreateUserDto): Promise<void> {
     const user = await this.findByEmail(dto.email);
     if (user) throw new BadRequestException('Email já utilizado.');
+
+    const nameReturn = await this.findByName(dto.name);
+    if (nameReturn) throw new BadRequestException('Nome já utilizado.');
   }
 
   public async create(dto: CreateUserDto): Promise<User> {
@@ -47,7 +54,7 @@ export class UsersService {
   }
 
   public async findAllNames(): Promise<User[]> {
-    return this.userModel.find({}, { name: 1, email: 1 });
+    return this.userModel.find({}, { name: 1 });
   }
 
   private async findUserByID(_id: string): Promise<User> {
@@ -67,6 +74,12 @@ export class UsersService {
       const user = await this.findByEmail(dto.email);
       if (user && String(user._id) != _id)
         throw new BadRequestException('Email já utilizado.');
+    }
+
+    if (dto.name) {
+      const user = await this.findByName(dto.name);
+      if (user && String(user._id) != _id)
+        throw new BadRequestException('Nome já utilizado.');
     }
   }
 

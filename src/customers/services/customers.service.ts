@@ -53,7 +53,7 @@ export class CustomersService {
   }
 
   public async findAllNames(): Promise<Customer[]> {
-    return this.customerModel.find({}, { name: 1, cpf: 1 });
+    return this.customerModel.find({}, { name: 1 });
   }
 
   public async findAll(): Promise<Customer[]> {

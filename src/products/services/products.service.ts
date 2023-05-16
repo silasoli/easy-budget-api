@@ -51,10 +51,7 @@ export class ProductsService {
 
     const category = this.getCategoryLabel(filter.category);
 
-    return this.productModel.find(
-      { category },
-      { name: 1, price: 1, brand: 1 },
-    );
+    return this.productModel.find({ category }, { name: 1 });
   }
 
   public async findAll(): Promise<Product[]> {

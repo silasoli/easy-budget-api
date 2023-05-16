@@ -7,7 +7,7 @@ export type CustomerDocument = Customer & Document;
 export class Customer {
   _id?: mongoose.ObjectId | string;
 
-  @Prop({ required: true, lowercase: true })
+  @Prop({ required: true, unique: true, lowercase: true })
   name: string;
 
   @Prop({ required: true, unique: true, lowercase: true })
