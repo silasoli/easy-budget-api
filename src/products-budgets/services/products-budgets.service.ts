@@ -70,7 +70,9 @@ export class ProductsBudgetsService {
   public async findAllProductsByBudget(_id: string): Promise<ProductsBudget[]> {
     await this.budgetService.findOne(_id);
 
-    return this.productsBudgetModel.find({ budgetId: _id });
+    return this.productsBudgetModel
+      .find({ budgetId: _id })
+      .populate([{ path: 'productId', select: ['name', 'brand', 'price'] }]);
   }
 
   private async findProductsBudgetByID(_id: string): Promise<ProductsBudget> {
