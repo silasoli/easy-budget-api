@@ -54,6 +54,13 @@ export class BudgetService {
     ]);
   }
 
+  public async findBudgetBySeller(_id: string): Promise<Budget[]> {
+    return this.budgetModel.find({ sellerId: _id }).populate([
+      { path: 'customerId', select: ['name'] },
+      { path: 'sellerId', select: ['name'] },
+    ]);
+  }
+
   private async findBudgetByID(_id: string): Promise<Budget> {
     const customer = await this.budgetModel.findById(_id).populate([
       { path: 'customerId', select: ['name'] },

@@ -47,6 +47,14 @@ export class BudgetController {
     return this.productsBudgetsService.calcAmountsByBudget(_id);
   }
 
+  @Get('seller/:id')
+  public async findAllBudgetBySeller(
+    @Param('id') _id: string,
+  ): Promise<Budget[]> {
+    ValidationUtil.validObjectId(_id);
+    return this.budgetService.findBudgetBySeller(_id);
+  }
+
   @Get(':id/html')
   public async generatePDF(@Param('id') _id: string): Promise<string> {
     ValidationUtil.validObjectId(_id);

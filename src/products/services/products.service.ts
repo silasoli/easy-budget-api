@@ -15,6 +15,7 @@ import { Model, QueryWithHelpers } from 'mongoose';
 import { MaterialCategoriesLabels } from '../enum/material-categories.enum';
 import { CategoryFilterDto } from '../dto/category-filter.dto';
 import { ValidationUtil } from '../../common/validations.util';
+import { NameFilterDto } from '../dto/name-filter.dto';
 
 @Injectable()
 export class ProductsService {
@@ -35,7 +36,9 @@ export class ProductsService {
     ValidationUtil.validCategoryType(dto.category);
 
     const product = await this.findByName(dto.name);
-    if (product) throw new BadRequestException('Nome já utilizado.');
+    const category = ValidationUtil.validEqualsCategory(dto.category, product);
+    if (product && category)
+      throw new BadRequestException('Nome já utilizado.');
   }
 
   public async create(dto: CreateProductDto): Promise<Product> {
@@ -66,6 +69,21 @@ export class ProductsService {
     const category = this.getCategoryLabel(filter.category);
 
     return this.productModel.find({ category });
+  }
+
+  public async filterByNameAndCategory(
+    filter: NameFilterDto,
+  ): Promise<Product[]> {
+    filter.name = filter.name.toLowerCase();
+    ValidationUtil.validCategoryType(filter.category);
+
+    const category = this.getCategoryLabel(filter.category);
+
+    const name = new RegExp(filter.name, 'i');
+
+    console.log(name);
+
+    return this.productModel.find({ category, name });
   }
 
   private async findProductByID(_id: string): Promise<Product> {

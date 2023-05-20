@@ -17,6 +17,7 @@ import { ValidationUtil } from '../../common/validations.util';
 import { Product } from '../schemas/product.entity';
 import { AuthUserJwtGuard } from '../../auth/guards/auth-user-jwt.guard';
 import { CategoryFilterDto } from '../dto/category-filter.dto';
+import { NameFilterDto } from '../dto/name-filter.dto';
 
 @ApiBearerAuth()
 @ApiTags('Products')
@@ -47,6 +48,13 @@ export class ProductsController {
     @Query() query: CategoryFilterDto,
   ): Promise<Product[]> {
     return this.productsService.findAllByCategory(query);
+  }
+
+  @Get('filter')
+  public async filterByNameAndCategory(
+    @Query() query: NameFilterDto,
+  ): Promise<Product[]> {
+    return this.productsService.filterByNameAndCategory(query);
   }
 
   @Get(':id')

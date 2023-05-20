@@ -17,7 +17,7 @@ export class CategoryType {
 export class Product {
   _id?: mongoose.ObjectId | string;
 
-  @Prop({ required: true, unique: true, lowercase: true })
+  @Prop({ required: true, lowercase: true })
   name: string;
 
   @Prop({ required: true, lowercase: true })
