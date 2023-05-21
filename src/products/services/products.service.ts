@@ -24,8 +24,12 @@ export class ProductsService {
     private productModel: Model<ProductDocument>,
   ) {}
 
-  public async findByName(name: string): Promise<Product> {
-    return this.productModel.findOne({ name: name.toLowerCase() });
+  public async findByNameAndCategory(
+    name: string,
+    categoryitem: string,
+  ): Promise<Product> {
+    const category = this.getCategoryLabel(categoryitem);
+    return this.productModel.findOne({ name: name.toLowerCase(), category });
   }
 
   private getCategoryLabel(materialType: string): CategoryType {
@@ -35,7 +39,7 @@ export class ProductsService {
   private async validCreate(dto: CreateProductDto): Promise<void> {
     ValidationUtil.validCategoryType(dto.category);
 
-    const product = await this.findByName(dto.name);
+    const product = await this.findByNameAndCategory(dto.name, dto.category);
     const category = ValidationUtil.validEqualsCategory(dto.category, product);
     if (product && category)
       throw new BadRequestException('Nome já utilizado.');
@@ -98,10 +102,17 @@ export class ProductsService {
     return this.findProductByID(_id);
   }
 
-  private async validUpdate(_id: string, dto: UpdateProductDto): Promise<void> {
+  private async validUpdate(
+    _id: string,
+    dto: UpdateProductDto,
+    product: Product,
+  ): Promise<void> {
     if (dto.name) {
-      const product = await this.findByName(dto.name);
-      if (product && String(product._id) != _id)
+      const existproduct = await this.findByNameAndCategory(
+        dto.name,
+        product.category.key,
+      );
+      if (existproduct && String(existproduct._id) != _id)
         throw new BadRequestException('Nome já utilizado.');
     }
   }
@@ -110,9 +121,9 @@ export class ProductsService {
     _id: string,
     dto: UpdateProductDto,
   ): Promise<QueryWithHelpers<unknown, unknown>> {
-    await this.findProductByID(_id);
+    const find = await this.findProductByID(_id);
 
-    await this.validUpdate(_id, dto);
+    await this.validUpdate(_id, dto, find);
 
     const product = { ...dto };
 
