@@ -78,14 +78,16 @@ export class ProductsService {
   public async filterByNameAndCategory(
     filter: NameFilterDto,
   ): Promise<Product[]> {
-    filter.name = filter.name.toLowerCase();
     ValidationUtil.validCategoryType(filter.category);
 
     const category = this.getCategoryLabel(filter.category);
 
-    const name = new RegExp(filter.name, 'i');
+    if (!filter.name) {
+      return this.productModel.find({ category });
+    }
 
-    console.log(name);
+    filter.name = filter.name.toLowerCase();
+    const name = new RegExp(filter.name, 'i');
 
     return this.productModel.find({ category, name });
   }
