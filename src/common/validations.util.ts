@@ -16,6 +16,7 @@ class ValidationUtilCls {
   }
 
   validEqualsCategory(category: string, product: Product): boolean {
+    if (!product) return false;
     return category === product.category.key;
   }
 }
