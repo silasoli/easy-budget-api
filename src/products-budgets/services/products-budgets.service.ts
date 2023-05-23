@@ -108,13 +108,13 @@ export class ProductsBudgetsService {
     return this.productsBudgetModel.deleteMany({ budgetId });
   }
 
-  public async generatePdf(_id: string): Promise<string> {
+  public async generatePdf(_id: string): Promise<any> {
     const data = await this.calcAmountsByBudget(_id);
     const budget = await this.budgetService.findOneWithPopulate(_id);
     const header = GeneratePDFUtil.generateHead(budget);
     const items = GeneratePDFUtil.generateTableOfItems(data.items);
     const footer = GeneratePDFUtil.generateFooter(data, items);
-    return `${header}${footer}`;
+    return { html: `${header}${footer}` };
   }
 
   public async calcAmountsByBudget(_id: string): Promise<ICalcAmount> {

@@ -56,7 +56,7 @@ export class BudgetController {
   }
 
   @Get(':id/html')
-  public async generatePDF(@Param('id') _id: string): Promise<string> {
+  public async generatePDF(@Param('id') _id: string): Promise<any> {
     ValidationUtil.validObjectId(_id);
     return this.productsBudgetsService.generatePdf(_id);
   }
